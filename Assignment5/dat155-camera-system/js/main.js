@@ -135,14 +135,21 @@ function loop(now) {
     // Hint: Add movement to the velocity vector.
     
     if (move.left) {
-        // TODO: implement movement
+        velocity[0] -= moveSpeed;
     }
 
     if (move.right) {
-        // TODO: implement movement
+        velocity[0] += moveSpeed;
     }
 
     // ... (add a case for move.forward and move.backward)
+    if (move.forward) {
+        velocity[2] -= moveSpeed;
+    }
+
+    if (move.backward) {
+        velocity[2] += moveSpeed;
+    }
 
     // Given the accumulated mouse movement this frame, use the mouse look controller to calculate the new rotation of the camera.
     mouseLookController.update(pitch, yaw); // TODO: implement code in MouseLookController
