@@ -53,11 +53,10 @@ var modelViewMatrix, projectionMatrix;
 var Base = 0;
 var LowerArm = 1;
 var UpperArm = 2;
+var Claws = 3;
 
 
-var theta= [ 0, 0, 0];
-
-var angle = 0;
+var theta= [ 0, 0, 0, 0];
 
 var modelViewMatrixLoc;
 
@@ -147,6 +146,9 @@ window.onload = function init() {
     document.getElementById("slider3").oninput = function(event) {
          theta[2] =  event.target.value;
     };
+    document.getElementById("slider4").oninput = function(event) {
+        theta[3] =  event.target.value;
+    };
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 
@@ -178,16 +180,51 @@ function base() {
 
 
 function claws() {
-    var s = scale(CLAWS_WIDTH, CLAWS_HEIGHT, CLAWS_WIDTH);
+    printm( translate(0.0, CLAWS_HEIGHT, 0.0));
+    printm(modelViewMatrix);
 
-    var instanceMatrix = mult( translate( 0.0, 0.5 * CLAWS_HEIGHT, 0.0 ), s);
+    modelViewMatrix  = mult(modelViewMatrix, translate(0.0, UPPER_ARM_HEIGHT, 0.0));
 
-    var t = mult(modelViewMatrix, instanceMatrix);
+    modelViewMatrix  = mult(modelViewMatrix, rotate(30, vec3(0, 0, 1)) );
+
+    let s = scale(CLAWS_WIDTH, CLAWS_HEIGHT, CLAWS_WIDTH);
+
+    modelViewMatrix  = mult(modelViewMatrix, rotate(theta[Claws], vec3(0, 0, 1)) );
+
+    let instanceMatrix = mult( translate( CLAWS_WIDTH, 0.5 * CLAWS_HEIGHT, 0.0 ), s);
+
+    let t = mult(modelViewMatrix, instanceMatrix);
 
     gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t)  );
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
 
+    modelViewMatrix  = mult(modelViewMatrix, rotate(-30, vec3(0, 0, 1)) );
 
+    instanceMatrix = mult( translate(CLAWS_WIDTH * 3.2, 1.5 * CLAWS_HEIGHT - 0.3, 0.0 ), s);
+
+    t = mult(modelViewMatrix, instanceMatrix);
+
+    gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t)  );
+    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+
+    modelViewMatrix  = mult(modelViewMatrix, rotate(- theta[Claws] * 2, vec3(0, 0, 1)) );
+    modelViewMatrix  = mult(modelViewMatrix, rotate(-30, vec3(0, 0, 1)) );
+
+    instanceMatrix = mult( translate( - CLAWS_WIDTH, 0.5 * CLAWS_HEIGHT, 0.0 ), s);
+
+    t = mult(modelViewMatrix, instanceMatrix);
+
+    gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t)  );
+    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+
+    modelViewMatrix  = mult(modelViewMatrix, rotate(30, vec3(0, 0, 1)) );
+
+    instanceMatrix = mult( translate(- CLAWS_WIDTH * 3.2, 1.5 * CLAWS_HEIGHT - 0.3, 0.0 ), s);
+
+    t = mult(modelViewMatrix, instanceMatrix);
+
+    gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t)  );
+    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
 
 }
 
@@ -249,13 +286,6 @@ var render = function() {
     modelViewMatrix  = mult(modelViewMatrix, rotate(theta[UpperArm], vec3(0, 0, 1)) );
 
     upperArm();
-
-    printm( translate(0.0, CLAWS_HEIGHT, 0.0));
-    printm(modelViewMatrix);
-
-    modelViewMatrix  = mult(modelViewMatrix, translate(0.0, UPPER_ARM_HEIGHT, 0.0));
-    modelViewMatrix  = mult(modelViewMatrix, rotate(theta[UpperArm], vec3(0, 0, 1)) );
-
     claws();
 
 //printm(modelViewMatrix);
